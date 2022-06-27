@@ -1,0 +1,24 @@
+﻿@using Models;
+
+<div>
+    
+    @if (NewsToDisplay.Any())
+    {
+            <h3>News</h3>
+            @foreach (var news in NewsToDisplay)
+            {
+                <div>
+                    <a>@news.Title</a>
+                    <br />
+                    <a href=@news.Article_Url>@news.Description</a>
+                </div>
+                <br/>
+                <br/>
+            }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<News> NewsToDisplay{ get; set; }
+}

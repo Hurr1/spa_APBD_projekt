@@ -1,0 +1,44 @@
+﻿@using Services;
+@using System;
+@using System.Globalization;
+@using Syncfusion.Blazor.Charts
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor
+@using Models
+@using APDBprojekt.Shared.Models
+@if (Data.Stocks.Any())
+{
+    <div class="control-section">
+        <div>
+            <SfStockChart Title ="@Data.SelectedCompany.Ticker" Width="100%">
+                <StockChartPeriods>
+                    <StockChartPeriod Text="Last month"></StockChartPeriod>
+                    <StockChartPeriod IntervalType=RangeIntervalType.Weeks Interval="3" Text='3w'></StockChartPeriod>
+                    <StockChartPeriod IntervalType=RangeIntervalType.Weeks Interval="1" Text='1w'></StockChartPeriod>
+                    <StockChartPeriod IntervalType=RangeIntervalType.Days Interval="1" Text='Today' Selected="true"></StockChartPeriod>
+                </StockChartPeriods>
+                <StockChartCrosshairSettings Enable="true" LineType="LineType.Vertical"></StockChartCrosshairSettings>
+                <StockChartTooltipSettings Enable="true" Shared="true" Format="${point.x} : ${point.y}" Header="@Data.SelectedCompany.Ticker"></StockChartTooltipSettings>
+                <StockChartSeriesCollection>
+                    <StockChartSeries DataSource="@Data.Stocks" Type="ChartSeriesType.Candle"
+                XName="Date" YName="Close" High="High" Low="Low" Open="Open" Close="Close" Volume="Volume"></StockChartSeries>
+                </StockChartSeriesCollection>
+            </SfStockChart>
+        </div>
+    </div>
+}
+else
+{
+    <p>No data for this company</p>
+}
+
+
+@code 
+{
+    [Inject]
+    ICompanyService companyService { get; set; }
+    public string UrlString { get; set; }
+
+    [Parameter]
+    public CompanyData Data { get; set; }
+}

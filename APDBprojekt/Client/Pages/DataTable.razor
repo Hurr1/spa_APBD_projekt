@@ -1,0 +1,50 @@
+﻿@page "/DataTable"
+@inject HttpClient Http
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Syncfusion.Blazor.Grids
+@using APDBprojekt.Client.Services
+@attribute [Authorize]
+
+<SfGrid DataSource="@Companies" AllowPaging="true" Height="315">
+    <GridEvents CommandClicked="OnCommandClicked" TValue="Company"></GridEvents>
+    <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true"></GridEditSettings>
+    <GridColumns>
+        <GridColumn Field=@nameof(Company.Ticker) HeaderText="Company Ticker" IsPrimaryKey="true" TextAlign="TextAlign.Left" Width="30"></GridColumn>
+        <GridColumn Field=@nameof(Company.Name) HeaderText="Company Name" Width="150"></GridColumn>
+        <GridColumn Field=@nameof(Company.Location) HeaderText="Company Location" EditType="EditType.DatePickerEdit" Format="d" TextAlign="TextAlign.Right" Width="130"></GridColumn>
+        <GridColumn HeaderText="Action" Width="150">
+            <GridCommandColumns>
+                <GridCommandColumn Type="CommandButtonType.Delete" ButtonOption="@(new CommandButtonOptions() { IconCss = "e-icons e-delete", CssClass = "e-flat" })"></GridCommandColumn>
+            </GridCommandColumns>
+         </GridColumn>
+    </GridColumns>
+</SfGrid>
+
+
+@code{
+    public IEnumerable<Company> Companies { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> _authState{ get; set; }
+
+    private AuthenticationState authState;
+
+    [Inject] 
+    ICompanyService companyService { get; set; }
+    
+    public string userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await _authState;
+        userId = authState.User.Claims.Where(x => x.Type == "sub").SingleOrDefault().ToString().Substring(5);
+        Companies = await companyService.GetUsersCompanies(userId);
+    }
+    public void OnClick(){}
+
+    public async Task OnCommandClicked(CommandClickEventArgs<Company> args)
+    {
+        await companyService.DeleteUsersCompany(args.RowData.Ticker, userId);
+    }
+}

@@ -1,0 +1,87 @@
+﻿@using APDBprojekt.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Blazored.Typeahead
+@using Services
+@using Syncfusion.Blazor.Layouts
+@using Models
+
+<BlazoredTypeahead SearchMethod="@AutoSearch"
+                   TValue ="CompanyDto"
+                   TItem ="CompanyDto"
+                   ValueChanged ="SelectedCompanyChanged"
+                   ValueExpression="@(()=>selectedCompany)"
+                   ShowDropDownOnFocus="true"
+                   EnableDropDown ="true"
+                   Debounce ="500"
+                   > 
+                                                     
+            <SelectedTemplate>
+                    @context.Ticker
+            </SelectedTemplate>
+            <ResultTemplate>
+                    <b>@context.Ticker</b> @context.Name
+            </ResultTemplate>
+    
+</BlazoredTypeahead>
+
+@code 
+{
+    [Inject]
+    ICompanyService companyService { get; set; }
+
+    [Inject] 
+    IStockService stockService { get; set; }
+
+    [Inject]
+    INewsService newsService{ get; set; }
+
+    [Parameter]
+    public EventCallback<CompanyData> SelCompanyChanged{ get; set; }
+
+    [Parameter]
+    public CompanyData Data { get; set; }
+
+    private CompanyDto selectedCompany;
+
+    private async Task<IEnumerable<CompanyDto>> AutoSearch(string searchCompany)
+    {  
+        var companies = await companyService.GetCompaniesByName(searchCompany);
+        return companies;
+    }
+
+    private async Task SelectedCompanyChanged(CompanyDto Company)
+    {
+        if(Company != null)
+        {
+            selectedCompany = Company;
+            Data.SelectedCompany = await companyService.GetCompany(Company.Ticker);
+            if (Data.SelectedCompany == null)
+            {
+                await SelCompanyChanged.InvokeAsync(new CompanyData());
+                return;
+            }
+            if(Data.SelectedCompany.Branding!= null)
+            {
+                Data.SelectedCompany.Branding.Icon = Data.SelectedCompany.Branding.Icon == null ? null : Data.SelectedCompany.Branding.Icon += "?apikey=mWIWpuj0izHoPFLlryveKnTSWF5OF_tm";
+            }
+            var ticker = Data.SelectedCompany.Ticker;
+            var endDate = DateTime.Today.ToString("yyyy-MM-dd");
+            var startDate = DateTime.Today.AddDays(-30).ToString("yyyy-MM-dd");
+
+
+            var stocks = stockService.GetCompanyStocks(startDate, endDate, ticker);
+            var news = newsService.GetNews(ticker);
+
+            Data.News = await news;
+            Data.Stocks = await stocks;
+            
+
+            await SelCompanyChanged.InvokeAsync(Data);
+            return;
+        }
+        await SelCompanyChanged.InvokeAsync(new CompanyData());
+    }
+    
+
+}

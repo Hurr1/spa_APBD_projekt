@@ -1,0 +1,94 @@
+﻿@using APDBprojekt.Shared
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Blazored.Typeahead
+@using Services
+@using Syncfusion.Blazor.Layouts
+@using Models;
+@attribute [Authorize]
+@page "/"
+<div id="tfl" style="width: 326px; height: 80px; margin:auto; display:table-cell">
+    <Search @bind-Data = "Data" @bind-Data:event ="SelCompanyChanged"/>
+</div>
+<div style ="width: 1850px; margin:auto">
+    @if (Data.SelectedCompany.Ticker != null)
+    {
+        
+            <Databoard company ="@Data.SelectedCompany"></Databoard>
+        
+            <StockChart Data ="@Data"> </StockChart>
+            
+            <NewsArticles NewsToDisplay = "@Data.News"></NewsArticles>
+    }
+    else
+    {
+        <div class ="center">
+            <p>Please, Choose a company.</p>
+            <p><br /></p>
+            <p>If you don't see search results or the selected company didn't load, please wait 1 minute and try again</p>
+        </div>
+    }
+</div>
+@code 
+{
+    [Inject] 
+    ICompanyService companyService { get; set; }
+
+    private CompanyData Data = new CompanyData();
+
+}
+
+
+<style>
+    .center {
+        margin: auto;
+        width: 60%;
+        border: 5px solid #000000;
+        padding: 10px;
+        font-size: 50px;
+    }
+    .e-dashboardlayout {
+        padding: 10px;
+    }
+    .e-panel-header {
+        padding: 10px;
+        margin-bottom: 0;
+        background-color: rgba(0, 0, 0, .03);
+    }
+    .panel-content {
+        vertical-align: middle;
+        font-size: 15px;
+        font-size: 15px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.61);
+        text-align: center;
+    }
+    .e-panel-content {
+        height: calc(100% - 28px);
+        width: 100%;
+        display: block;
+    }
+    .e-panel .e-header-text {
+        padding: 12px 0 12px 0;
+    }
+    .e-dashboardlayout.e-control .e-panel .e-panel-header {
+        font-size: 15px;
+        font-weight: 500;
+        height: 37px;
+        line-height: 30px;
+        padding: 10px;
+        vertical-align: middle;
+        border-bottom: 0.5px solid #e3e3e3;
+    }
+    .mobile .e-control.e-lib.e-dashboardlayout.e-responsive {
+        z-index: 0;
+        overflow: scroll;
+    }
+    .e-control.e-lib.e-dashboardlayout.e-responsive {
+        z-index: 0;
+    }
+    .bootstrap5 .e-dashboardlayout.e-control .e-panel .e-panel-header,
+    .bootstrap5-dark .e-dashboardlayout.e-control .e-panel .e-panel-header {
+        line-height: 20px;
+    }
+</style>

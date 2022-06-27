@@ -1,0 +1,20 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="main">
+        <div class="top-row px-4 auth">
+            <div>
+                <a href="https://localhost:5001/">Search</a>
+            </div>
+            <div>
+                <a href="https://localhost:5001/datatable">Table</a>
+            </div>
+            
+            <LoginDisplay />
+        </div>
+
+        <div class="content px-4">
+            @Body
+        </div>
+    </div>
+</div>

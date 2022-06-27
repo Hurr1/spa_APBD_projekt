@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "APDBprojekt.Shared": {
+      "commandName": "Project"
+    },
+    "Профиль 1": {
+      "commandName": "Executable"
+    }
+  }
+}
